@@ -8,40 +8,11 @@ use druid::widget::{
 use druid::{Color, Data, ExtEventSink, Key, Lens, Widget, WidgetExt};
 
 use crate::clipboard::Content;
+use crate::gui::style::CONTAINER_BACKGROUND;
 
 mod style;
 
 pub const CONTENT_SENDER: Key<Arc<Sender<Content>>> = Key::new("history_clipboard.content_sender");
-
-/*pub fn run() {
-    let main_window = WindowDesc::new(ui_builder()).title("Clipboards");
-
-    let image_buf = ImageBuf::from_file("1.jpeg").unwrap();
-
-    let contents = (0..100)
-        .map(|i| {
-            if i % 2 == 0 {
-                ClipboardContent::Text(format!("text 测试 {} 测试", i))
-            } else {
-                let mut hasher = Md5::default();
-                hasher.update(image_buf.raw_pixels());
-                let mut sum = hasher.finalize_fixed();
-
-                ClipboardContent::Image(image_buf.clone(), *sum.as_mut())
-            }
-        })
-        .collect();
-
-    let clipboards = Clipboards {
-        input: "".to_string(),
-        contents,
-    };
-
-    AppLauncher::with_window(main_window)
-        .log_to_console()
-        .launch(clipboards)
-        .unwrap()
-}*/
 
 #[derive(Debug, Clone, Data, Lens)]
 pub struct Clipboard {
@@ -94,7 +65,9 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
         .padding(5.0);
 
         ControllerHost::new(
-            Container::new(clickable_label).rounded(7.0),
+            Container::new(clickable_label)
+                .rounded(7.0)
+                .background(CONTAINER_BACKGROUND),
             style::ContainerController,
         )
         .expand_width()

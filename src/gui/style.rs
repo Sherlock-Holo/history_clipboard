@@ -4,7 +4,7 @@ use druid::{Color, Data, Env, Event, EventCtx, Widget};
 const WHITE_COLOR: Color = Color::rgb8(255, 255, 255);
 const BLACK_COLOR: Color = Color::rgb8(0, 0, 0);
 const BORDER_COLOR: Color = Color::rgb8(46, 179, 152);
-const CONTAINER_BACKGROUND: Color = Color::rgb8(210, 210, 210);
+pub const CONTAINER_BACKGROUND: Color = Color::rgb8(210, 210, 210);
 
 pub struct ButtonLabelController;
 
