@@ -1,0 +1,16 @@
+[package]
+name = "history_clipboard"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+druid = { version = "0.7", features = ["png", "im"], git = "https://github.com/linebender/druid" }
+md-5 = "0.10"
+x11-clipboard = "0.6"
+image = "0.23" # TODO update to the 0.24 when druid use 0.24 image
+crossbeam-channel = "0.5"
+anyhow = "1"
+tracing = "0.1"
+tap = "1"
