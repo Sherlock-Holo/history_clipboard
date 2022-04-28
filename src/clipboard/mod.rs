@@ -235,7 +235,7 @@ impl Clipboard {
             self.x11_clipboard.setter.atoms.property,
             Duration::from_millis(50),
         ) {
-            Err(Error::UnexpectedType(_)) => Ok(None),
+            Err(Error::UnexpectedType(_) | Error::Timeout) => Ok(None),
             Err(err) => {
                 error!(?err, "get text from clipboard failed");
 
@@ -253,7 +253,7 @@ impl Clipboard {
             self.x11_clipboard.setter.atoms.property,
             Duration::from_millis(50),
         ) {
-            Err(Error::UnexpectedType(_)) => Ok(None),
+            Err(Error::UnexpectedType(_) | Error::Timeout) => Ok(None),
             Err(err) => {
                 error!(?err, "get image from clipboard failed");
 

@@ -1,5 +1,5 @@
-use druid::widget::{Container, Controller, Image, Label};
-use druid::{Color, Data, Env, Event, EventCtx, Widget};
+use druid::widget::{Controller, Image, Label};
+use druid::{Color, Data, Env, Event, EventCtx, PaintCtx, RenderContext, Widget};
 
 const WHITE_COLOR: Color = Color::rgb8(255, 255, 255);
 const BLACK_COLOR: Color = Color::rgb8(0, 0, 0);
@@ -28,36 +28,19 @@ impl<S: Data> Controller<S, Label<S>> for ButtonLabelController {
             child.set_text_color(BLACK_COLOR);
         }
 
-        ctx.children_changed();
+        ctx.request_layout();
         child.event(ctx, event, data, env)
     }
 }
 
 impl<S: Data> Controller<S, Image> for ButtonLabelController {}
 
-pub struct ContainerController;
+pub fn container_painter<T>(pain_ctx: &mut PaintCtx, _: &T, _: &Env) {
+    let rect = pain_ctx.size().to_rect();
 
-impl<S: Data> Controller<S, Container<S>> for ContainerController {
-    fn event(
-        &mut self,
-        child: &mut Container<S>,
-        ctx: &mut EventCtx,
-        event: &Event,
-        data: &mut S,
-        env: &Env,
-    ) {
-        if ctx.is_hot()
-            && matches!(
-                event,
-                Event::MouseDown(_) | Event::MouseMove(_) | Event::MouseUp(_)
-            )
-        {
-            child.set_background(BORDER_COLOR)
-        } else {
-            child.set_background(CONTAINER_BACKGROUND);
-        }
-
-        ctx.children_changed();
-        child.event(ctx, event, data, env)
+    if pain_ctx.is_hot() {
+        pain_ctx.fill(rect, &BORDER_COLOR);
+    } else {
+        pain_ctx.fill(rect, &CONTAINER_BACKGROUND);
     }
 }

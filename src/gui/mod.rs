@@ -3,12 +3,11 @@ use std::sync::Arc;
 use crossbeam_channel::{Receiver, Sender};
 use druid::im::Vector;
 use druid::widget::{
-    Container, ControllerHost, Flex, Image, Label, LineBreaking, List, ViewSwitcher,
+    Container, ControllerHost, Flex, Image, Label, LineBreaking, List, Painter, ViewSwitcher,
 };
 use druid::{Color, Data, ExtEventSink, Key, Lens, Widget, WidgetExt};
 
 use crate::clipboard::Content;
-use crate::gui::style::CONTAINER_BACKGROUND;
 
 mod style;
 
@@ -45,7 +44,7 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
 
                     let label = ControllerHost::new(label, style::ButtonLabelController);
 
-                    label.boxed()
+                    label.padding(5.0).boxed()
                 }
 
                 Content::Image(content_img) => {
@@ -53,7 +52,7 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
 
                     let image = ControllerHost::new(image, style::ButtonLabelController);
 
-                    image.boxed()
+                    image.padding(5.0).boxed()
                 }
             },
         )
@@ -61,18 +60,14 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
             let sender: Arc<Sender<Content>> = env.get(&CONTENT_SENDER);
 
             let _ = sender.send(content.clone());
-        })
-        .padding(5.0);
+        });
 
-        ControllerHost::new(
-            Container::new(clickable_label)
-                .rounded(7.0)
-                .background(CONTAINER_BACKGROUND),
-            style::ContainerController,
-        )
-        .expand_width()
-        .height(100.0)
-        .padding(10.0)
+        Container::new(clickable_label)
+            .background(Painter::new(style::container_painter))
+            .rounded(7.0)
+            .expand_width()
+            .height(100.0)
+            .padding(10.0)
     })
     .center()
     .expand_width()
