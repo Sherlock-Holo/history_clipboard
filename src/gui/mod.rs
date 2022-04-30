@@ -1,14 +1,14 @@
 use std::sync::Arc;
 
 use crossbeam_channel::{Receiver, Sender};
+use custom_button::CustomButton;
 use druid::im::Vector;
-use druid::widget::{
-    Container, ControllerHost, Flex, Image, Label, LineBreaking, List, Painter, ViewSwitcher,
-};
+use druid::widget::{Container, Flex, Image, Label, LineBreaking, List, ViewSwitcher};
 use druid::{Color, Data, ExtEventSink, Key, Lens, Widget, WidgetExt};
 
 use crate::clipboard::Content;
 
+mod custom_button;
 mod style;
 
 pub const CONTENT_SENDER: Key<Arc<Sender<Content>>> = Key::new("history_clipboard.content_sender");
@@ -30,7 +30,7 @@ impl Clipboard {
 
 pub fn ui_builder() -> impl Widget<Clipboard> {
     const BACKGROUND_COLOR: Color = Color::rgb8(242, 242, 242);
-    const TEXT_COLOR: Color = Color::rgb8(0, 0, 0);
+    const TEXT_COLOR: Color = Color::BLACK;
 
     let list = List::new(|| {
         let clickable_label = ViewSwitcher::new(
@@ -42,17 +42,19 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
                         .with_line_break_mode(LineBreaking::Clip)
                         .with_text_color(TEXT_COLOR);
 
-                    let label = ControllerHost::new(label, style::ButtonLabelController);
-
-                    label.padding(5.0).boxed()
+                    CustomButton::new(label)
+                        .style(style::MyStyleSheet)
+                        .padding(5.0)
+                        .boxed()
                 }
 
                 Content::Image(content_img) => {
                     let image = Image::new(content_img.image_buf.clone());
 
-                    let image = ControllerHost::new(image, style::ButtonLabelController);
-
-                    image.padding(5.0).boxed()
+                    CustomButton::new(image)
+                        .style(style::MyStyleSheet)
+                        .padding(5.0)
+                        .boxed()
                 }
             },
         )
@@ -63,8 +65,6 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
         });
 
         Container::new(clickable_label)
-            .background(Painter::new(style::container_painter))
-            .rounded(7.0)
             .expand_width()
             .height(100.0)
             .padding(10.0)

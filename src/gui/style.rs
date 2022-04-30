@@ -1,46 +1,55 @@
-use druid::widget::{Controller, Image, Label};
-use druid::{Color, Data, Env, Event, EventCtx, PaintCtx, RenderContext, Widget};
+use druid::Color;
 
-const WHITE_COLOR: Color = Color::rgb8(255, 255, 255);
-const BLACK_COLOR: Color = Color::rgb8(0, 0, 0);
-const BORDER_COLOR: Color = Color::rgb8(46, 179, 152);
-pub const CONTAINER_BACKGROUND: Color = Color::rgb8(210, 210, 210);
+use super::custom_button::{BorderStyle, DefaultStyle, Style, StyleSheet};
 
-pub struct ButtonLabelController;
+#[derive(Debug, Default, Copy, Clone)]
+pub struct MyStyleSheet;
 
-impl<S: Data> Controller<S, Label<S>> for ButtonLabelController {
-    fn event(
-        &mut self,
-        child: &mut Label<S>,
-        ctx: &mut EventCtx,
-        event: &Event,
-        data: &mut S,
-        env: &Env,
-    ) {
-        if ctx.is_hot()
-            && matches!(
-                event,
-                Event::MouseDown(_) | Event::MouseMove(_) | Event::MouseUp(_)
-            )
-        {
-            child.set_text_color(WHITE_COLOR);
-        } else {
-            child.set_text_color(BLACK_COLOR);
-        }
+impl MyStyleSheet {
+    const RADIUS: f64 = 10.0;
+    fn background() -> Color {
+        Color::rgb8(251, 251, 251)
+    }
 
-        ctx.request_layout();
-        child.event(ctx, event, data, env)
+    fn border() -> Color {
+        Color::rgb8(46, 179, 152)
     }
 }
 
-impl<S: Data> Controller<S, Image> for ButtonLabelController {}
+impl<T> StyleSheet<T> for MyStyleSheet {
+    fn enabled(&self) -> Style<T> {
+        let mut style = DefaultStyle::default().enabled();
+        style.border_radius = Self::RADIUS.into();
+        style.background = Some(Self::background().into());
 
-pub fn container_painter<T>(pain_ctx: &mut PaintCtx, _: &T, _: &Env) {
-    let rect = pain_ctx.size().to_rect();
+        style
+    }
 
-    if pain_ctx.is_hot() {
-        pain_ctx.fill(rect, &BORDER_COLOR);
-    } else {
-        pain_ctx.fill(rect, &CONTAINER_BACKGROUND);
+    fn hovered(&self) -> Style<T> {
+        let mut style = DefaultStyle::default().hovered();
+        style.border = Some(BorderStyle {
+            width: 2.5.into(),
+            color: Self::border().into(),
+        });
+        style.border_radius = Self::RADIUS.into();
+        style.background = Some(Self::background().into());
+
+        style
+    }
+
+    fn pressed(&self) -> Style<T> {
+        let mut style = DefaultStyle::default().pressed();
+        style.border_radius = Self::RADIUS.into();
+        style.background = Some(Self::background().into());
+
+        style
+    }
+
+    fn disabled(&self) -> Style<T> {
+        let mut style = DefaultStyle::default().disabled();
+        style.border_radius = Self::RADIUS.into();
+        style.background = Some(Self::background().into());
+
+        style
     }
 }
