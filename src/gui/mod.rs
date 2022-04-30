@@ -40,21 +40,16 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
                     let label = Label::new(text.to_string())
                         .with_text_size(20.0)
                         .with_line_break_mode(LineBreaking::Clip)
-                        .with_text_color(TEXT_COLOR);
+                        .with_text_color(TEXT_COLOR)
+                        .padding(5.0);
 
-                    CustomButton::new(label)
-                        .style(style::MyStyleSheet)
-                        .padding(5.0)
-                        .boxed()
+                    CustomButton::new(label).style(style::MyStyleSheet).boxed()
                 }
 
                 Content::Image(content_img) => {
-                    let image = Image::new(content_img.image_buf.clone());
+                    let image = Image::new(content_img.image_buf.clone()).padding(5.0);
 
-                    CustomButton::new(image)
-                        .style(style::MyStyleSheet)
-                        .padding(5.0)
-                        .boxed()
+                    CustomButton::new(image).style(style::MyStyleSheet).boxed()
                 }
             },
         )
