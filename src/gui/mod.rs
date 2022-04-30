@@ -3,12 +3,14 @@ use std::sync::Arc;
 use crossbeam_channel::{Receiver, Sender};
 use custom_button::CustomButton;
 use druid::im::Vector;
-use druid::widget::{Container, Flex, Image, Label, LineBreaking, List, ViewSwitcher};
+use druid::widget::{Button, Container, Flex, Image, Label, LineBreaking, List, ViewSwitcher};
 use druid::{Color, Data, ExtEventSink, Key, Lens, Widget, WidgetExt};
+use multi_type_vector::{ContentType, MultiVector};
 
 use crate::clipboard::Content;
 
 mod custom_button;
+mod multi_type_vector;
 mod style;
 
 pub const CONTENT_SENDER: Key<Arc<Sender<Content>>> = Key::new("history_clipboard.content_sender");
@@ -16,19 +18,19 @@ pub const CONTENT_SENDER: Key<Arc<Sender<Content>>> = Key::new("history_clipboar
 #[derive(Debug, Clone, Data, Lens)]
 pub struct Clipboard {
     max_size: usize,
-    contents: Vector<Content>,
+    contents: MultiVector,
 }
 
 impl Clipboard {
     pub fn new(max_size: usize) -> Self {
         Self {
             max_size,
-            contents: Default::default(),
+            contents: MultiVector::new(ContentType::All, Vector::new()),
         }
     }
 }
 
-pub fn ui_builder() -> impl Widget<Clipboard> {
+pub fn new_ui() -> impl Widget<Clipboard> {
     const BACKGROUND_COLOR: Color = Color::rgb8(242, 242, 242);
     const TEXT_COLOR: Color = Color::BLACK;
 
@@ -70,11 +72,37 @@ pub fn ui_builder() -> impl Widget<Clipboard> {
     .vertical()
     .lens(Clipboard::contents);
 
-    let flex = Flex::column().with_flex_child(list, 1.0);
+    let all_button = Button::new("all")
+        .on_click(|_ctx, clipboard: &mut Clipboard, _env| {
+            clipboard.contents.set_content_type(ContentType::All);
+        })
+        .center()
+        .expand_width();
 
-    Container::new(flex)
+    let text_button = Button::new("text")
+        .on_click(|_ctx, clipboard: &mut Clipboard, _env| {
+            clipboard.contents.set_content_type(ContentType::Text);
+        })
+        .center()
+        .expand_width();
+
+    let image_button = Button::new("image")
+        .on_click(|_ctx, clipboard: &mut Clipboard, _env| {
+            clipboard.contents.set_content_type(ContentType::Image);
+        })
+        .center()
+        .expand_width();
+
+    let top = Flex::row()
+        .with_flex_child(all_button, 0.3)
+        .with_flex_child(text_button, 0.3)
+        .with_flex_child(image_button, 0.3);
+
+    Flex::column()
+        .with_flex_child(top, 0.1)
+        .with_flex_child(list, 0.9)
         .expand_height()
-        .expand_width()
+        .expand_height()
         .background(BACKGROUND_COLOR)
 }
 

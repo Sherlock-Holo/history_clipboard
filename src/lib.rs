@@ -10,7 +10,7 @@ mod clipboard;
 mod gui;
 
 pub fn run() -> Result<()> {
-    let window = WindowDesc::new(gui::ui_builder())
+    let window = WindowDesc::new(gui::new_ui())
         .title("History Clipboard")
         .window_size(Size {
             width: 350.0,
