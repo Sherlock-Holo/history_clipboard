@@ -1,17 +1,17 @@
 use druid::im::Vector;
 use druid::widget::ListIter;
-use druid::Data;
+use druid::{Data, Lens};
 
 use crate::clipboard::Content;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Data)]
 pub enum ContentType {
     All,
     Text,
     Image,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Lens)]
 pub struct MultiVector {
     content_type: ContentType,
     contents: Vector<Content>,
@@ -23,10 +23,6 @@ impl MultiVector {
             content_type,
             contents,
         }
-    }
-
-    pub fn set_content_type(&mut self, content_type: ContentType) {
-        self.content_type = content_type;
     }
 
     pub fn push_front(&mut self, content: Content) {
