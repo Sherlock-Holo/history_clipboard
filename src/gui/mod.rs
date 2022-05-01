@@ -2,14 +2,15 @@ use std::sync::Arc;
 
 use crossbeam_channel::{Receiver, Sender};
 use custom_button::CustomButton;
+use custom_radio::CustomRadio;
 use druid::im::Vector;
-use druid::widget::{Container, Flex, Image, Label, LineBreaking, List, ViewSwitcher};
+use druid::widget::{Container, Flex, Image, Label, LineBreaking, List, Svg, ViewSwitcher};
 use druid::{Color, Data, ExtEventSink, Key, Lens, LensExt, Widget, WidgetExt};
 use multi_type_vector::{ContentType, MultiVector};
 
 use crate::clipboard::Content;
-use crate::gui::custom_radio::CustomRadio;
 
+mod assets;
 mod custom_button;
 mod custom_radio;
 mod multi_type_vector;
@@ -78,63 +79,7 @@ pub fn new_ui() -> impl Widget<Clipboard> {
     .vertical()
     .lens(Clipboard::contents);
 
-    /*let all_button = Button::new("all")
-        .on_click(|_ctx, clipboard: &mut Clipboard, _env| {
-            clipboard.contents.set_content_type(ContentType::All);
-        })
-        .center()
-        .expand_width();
-
-    let text_button = Button::new("text")
-        .on_click(|_ctx, clipboard: &mut Clipboard, _env| {
-            clipboard.contents.set_content_type(ContentType::Text);
-        })
-        .center()
-        .expand_width();
-
-    let image_button = Button::new("image")
-        .on_click(|_ctx, clipboard: &mut Clipboard, _env| {
-            clipboard.contents.set_content_type(ContentType::Image);
-        })
-        .center()
-        .expand_width();*/
-    let all_radio = CustomRadio::new(
-        Label::new("all").with_text_color(Color::BLACK).center(),
-        ContentType::All,
-    )
-    .style(style::radio::CustomStyleSheet)
-    .on_click(|_ctx, content_type: &mut ContentType, _env| {
-        *content_type = ContentType::All;
-    })
-    .expand_width()
-    .lens(Clipboard::contents.then(MultiVector::content_type));
-
-    let text_radio = CustomRadio::new(
-        Label::new("text").with_text_color(Color::BLACK).center(),
-        ContentType::Text,
-    )
-    .style(style::radio::CustomStyleSheet)
-    .on_click(|_ctx, content_type: &mut ContentType, _env| {
-        *content_type = ContentType::Text;
-    })
-    .expand_width()
-    .lens(Clipboard::contents.then(MultiVector::content_type));
-
-    let image_radio = CustomRadio::new(
-        Label::new("image").with_text_color(Color::BLACK).center(),
-        ContentType::Image,
-    )
-    .style(style::radio::CustomStyleSheet)
-    .on_click(|_ctx, content_type: &mut ContentType, _env| {
-        *content_type = ContentType::Image;
-    })
-    .expand_width()
-    .lens(Clipboard::contents.then(MultiVector::content_type));
-
-    let top = Flex::row()
-        .with_flex_child(all_radio.padding(10.0), 0.3)
-        .with_flex_child(text_radio.padding(10.0), 0.3)
-        .with_flex_child(image_radio.padding(10.0), 0.3);
+    let top = make_top_ui();
 
     Flex::column()
         .with_flex_child(top, 0.1)
@@ -142,6 +87,49 @@ pub fn new_ui() -> impl Widget<Clipboard> {
         .expand_height()
         .expand_height()
         .background(BACKGROUND_COLOR)
+}
+
+fn make_top_ui() -> Flex<Clipboard> {
+    let all_radio = CustomRadio::new(
+        Svg::new(assets::ALL_SVG.parse().unwrap()).center(),
+        ContentType::All,
+    )
+    .style(style::radio::CustomStyleSheet)
+    .on_click(|_ctx, content_type: &mut ContentType, _env| {
+        *content_type = ContentType::All;
+    })
+    .expand_width()
+    .expand_height()
+    .lens(Clipboard::contents.then(MultiVector::content_type));
+
+    let text_radio = CustomRadio::new(
+        Svg::new(assets::TEXT_SVG.parse().unwrap()).center(),
+        ContentType::Text,
+    )
+    .style(style::radio::CustomStyleSheet)
+    .on_click(|_ctx, content_type: &mut ContentType, _env| {
+        *content_type = ContentType::Text;
+    })
+    .expand_width()
+    .expand_height()
+    .lens(Clipboard::contents.then(MultiVector::content_type));
+
+    let image_radio = CustomRadio::new(
+        Svg::new(assets::IMAGE_SVG.parse().unwrap()).center(),
+        ContentType::Image,
+    )
+    .style(style::radio::CustomStyleSheet)
+    .on_click(|_ctx, content_type: &mut ContentType, _env| {
+        *content_type = ContentType::Image;
+    })
+    .expand_width()
+    .expand_height()
+    .lens(Clipboard::contents.then(MultiVector::content_type));
+
+    Flex::row()
+        .with_flex_child(all_radio.padding(10.0), 0.3)
+        .with_flex_child(text_radio.padding(10.0), 0.3)
+        .with_flex_child(image_radio.padding(10.0), 0.3)
 }
 
 pub fn update_clipboard(event_sink: ExtEventSink, content_receiver: Receiver<Content>) {
